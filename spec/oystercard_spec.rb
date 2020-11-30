@@ -1,2 +1,3 @@
-describe "anything" do
+require 'oystercard'
+describe Oystercard do
 end
