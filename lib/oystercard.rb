@@ -1,12 +1,14 @@
 class Oystercard
-  attr_accessor :balance, :capacity, :in_use
+  attr_accessor :balance, :capacity, :in_use, :minimum_fare
 
   DEFAULT_CAPACITY = 90
+  MINIMUM_FARE = 1
 
   def initialize
     @balance = 0
     @capacity = DEFAULT_CAPACITY
     @in_use = false
+    @minimum_fare = MINIMUM_FARE
   end
 
   def top_up(money)
@@ -19,6 +21,7 @@ class Oystercard
   end
 
   def touch_in
+    fail "Not enough funds" if @balance < 1
     @in_use = true
   end
 

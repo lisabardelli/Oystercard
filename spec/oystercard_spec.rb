@@ -31,7 +31,7 @@ describe Oystercard do
   end
 
   describe '#deduct' do
-    it 'deduct from the balance' do
+    it 'deduct from the balance' do 
       expect { subject.deduct(1) }.to change { subject.balance }.by -1
     end
   end
@@ -49,13 +49,19 @@ describe Oystercard do
 
   describe '#touch_in' do
     it "changes @in_use from false to true" do
+      subject.top_up(subject.minimum_fare)
       subject.touch_in
       expect(subject.in_use).to eq true
+    end
+
+    it 'touch in fails when balance < 1' do
+      expect { subject.touch_in }.to raise_error "Not enough funds"
     end
   end
 
   describe '#touch_out' do
     it ' changes @in_use from true to false' do
+        subject.top_up(subject.minimum_fare)
         subject.touch_in
         subject.touch_out
       expect(subject.in_use).to eq false
@@ -64,6 +70,7 @@ describe Oystercard do
 
   describe '#in_journey?' do
     it 'return true if card is in use' do
+      subject.top_up(subject.minimum_fare)
       subject.touch_in
       expect(subject).to be_in_journey
     end
