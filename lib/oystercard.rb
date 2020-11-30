@@ -11,5 +11,7 @@ def top_up(money)
     fail "Cannot exeed max balance (#{MAXIMUM_BALANCE})!" if (@balance + money) > MAXIMUM_BALANCE
     @balance += money
 end
-
+    def deduct(money)
+        @balance -=money
+    end
 end
