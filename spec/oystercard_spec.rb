@@ -9,15 +9,19 @@ describe Oystercard do
   it 'initializes with a balance of zero' do
     expect(subject.balance).to eq 0
   end
- 
-  it 'will top up the balance' do 
+
+  it 'will top up the balance' do
     expect(subject).to respond_to(:top_up).with(1).argument
   end
 
   describe '#top_up' do
     it 'will top up the balance' do
-      expect { subject.top_up(1) }.to change { subject.balance }.by 1 
-    
+      expect { subject.top_up(1) }.to change { subject.balance }.by 1
+    end
+
+    it 'raises error if user tries to topup past max capacity' do
+      subject.capacity.times { subject.top_up(1) }
+      expect { subject.top_up(1) }.to raise_error "Cap  of #{subject.capacity} reached"
     end
   end
 end
