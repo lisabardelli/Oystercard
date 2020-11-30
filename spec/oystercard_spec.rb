@@ -6,7 +6,7 @@ describe Oystercard do
   it "is created with a default balance of zero" do
     expect(card.balance).to eq(0)
   end
-   
+
   describe "#top_up" do
     it "returns updated balance after calling top_up method" do
         card.top_up(20)
@@ -21,6 +21,28 @@ describe Oystercard do
         card.top_up(20)
         card.deduct(5)
         expect(card.balance).to eq(15)
-    end 
+    end
+  end
+  describe "#touch_in" do
+    it "changes the state of the card to 'in_journey' " do
+      card.touch_in
+      expect(card.in_journey).to eq(true)
+    end
+  end
+  describe "#touch_out" do
+    it "changes the state of the card to 'not_in_journey'" do
+      card.touch_out
+      expect(card.in_journey).to eq(false)
+    end
+  end
+  describe "#in_journey?" do
+    it "returns true for an 'in' card" do
+      card.touch_in
+      expect(card.in_journey).to be(true)
+    end
+    it "returns false for an 'out' card" do
+      card.touch_out
+      expect(card.in_journey).to be(false)
+    end
   end
 end
