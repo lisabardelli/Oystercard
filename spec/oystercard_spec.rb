@@ -1,7 +1,10 @@
 require 'oystercard'
+require 'station'
 
 describe Oystercard do
   let(:oystercard) { described_class.new }
+  let(:station) { Station.new }
+
   it 'responds to balance' do
     expect(subject).to respond_to(:balance)
   end
@@ -15,7 +18,7 @@ describe Oystercard do
   end
 
   it 'oystercard responds to touch_in' do
-    expect(subject).to respond_to(:touch_in)
+    expect(subject).to respond_to(:touch_in).with(1).argument
   end
 
   it 'responds to touch_out' do
@@ -40,26 +43,32 @@ describe Oystercard do
   describe '#touch_in' do
     it "changes @in_use from false to true" do
       subject.top_up(subject.minimum_fare)
-      subject.touch_in
+      subject.touch_in(station)
       expect(subject.in_use).to eq true
     end
 
     it 'touch in fails when balance < 1' do
-      expect { subject.touch_in }.to raise_error "Not enough funds"
+      expect { subject.touch_in(station) }.to raise_error "Not enough funds"
+    end
+
+    it 'remembers the station' do
+      subject.top_up(subject.minimum_fare)
+      subject.touch_in(station)
+      expect(subject.start_station).to eq station 
     end
   end
 
   describe '#touch_out' do
     it ' changes @in_use from true to false' do
         subject.top_up(subject.minimum_fare)
-        subject.touch_in
+        subject.touch_in(station)
         subject.touch_out
       expect(subject.in_use).to eq false
     end
 
     it 'deducts minimum fare from balance' do
       subject.top_up(subject.minimum_fare)
-      subject.touch_in
+      subject.touch_in(station)
       expect { subject.touch_out}. to change{ subject.balance }.by(-(subject.minimum_fare))
     end
   end
@@ -67,7 +76,7 @@ describe Oystercard do
   describe '#in_journey?' do
     it 'return true if card is in use' do
       subject.top_up(subject.minimum_fare)
-      subject.touch_in
+      subject.touch_in(station)
       expect(subject).to be_in_journey
     end
 

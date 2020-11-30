@@ -1,5 +1,7 @@
+require_relative 'station'
+
 class Oystercard
-  attr_accessor :balance, :capacity, :in_use, :minimum_fare
+  attr_accessor :balance, :capacity, :in_use, :minimum_fare, :start_station
 
   DEFAULT_CAPACITY = 90
   MINIMUM_FARE = 1
@@ -16,9 +18,14 @@ class Oystercard
     @balance += money
   end
 
-  def touch_in
+  def deduct(money)
+    @balance -= money
+  end
+
+  def touch_in(station)
     fail "Not enough funds" if @balance < 1
     @in_use = true
+    @start_station = station
   end
 
   def touch_out
@@ -28,6 +35,9 @@ class Oystercard
 
   def in_journey?
     @in_use == true
+  end
+
+  def station
   end
 
   private
