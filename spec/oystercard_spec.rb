@@ -16,13 +16,6 @@ describe Oystercard do
       expect { card.top_up(Oystercard::MAXIMUM_BALANCE + 1) }.to raise_error("Cannot exeed max balance (#{Oystercard::MAXIMUM_BALANCE})!")
     end
   end
-  describe '#deduct' do
-    it 'deducts amount of money from balance' do
-      card.top_up(20)
-      card.deduct(5)
-      expect(card.balance).to eq(15)
-    end
-  end
   describe '#touch_in' do
     it "changes the state of the card to 'in_journey' " do
       card.top_up(Oystercard::MINIMUM_BALANCE + 1)
@@ -37,6 +30,11 @@ describe Oystercard do
     it "changes the state of the card to 'not_in_journey'" do
       card.touch_out
       expect(card.in_journey).to eq(false)
+    end
+    it "deducts the MINIMUM_FARE from the card balance" do
+      card.top_up(20)
+      card.touch_in
+      expect{card.touch_out}.to change{card.balance}.from(20).to(20 - Oystercard::MINIMUM_FARE)
     end
   end
   describe '#in_journey?' do
