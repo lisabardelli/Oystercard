@@ -4,6 +4,8 @@ require 'station'
 describe Oystercard do
   let(:oystercard) { described_class.new }
   let(:station) { double :station }
+  let(:start_station) {double :start_station}
+  let(:exit_station) {double :exit_station}
 
   it 'responds to balance' do
     expect(subject).to respond_to(:balance) #expects oystercard to respond to balance
@@ -22,7 +24,7 @@ describe Oystercard do
   end
 
   it 'responds to touch_out' do
-    expect(subject).to respond_to(:touch_out) # expect oystercard to respond to touch out 
+    expect(subject).to respond_to(:touch_out).with(1).argument  # expect oystercard to respond to touch out 
   end
 
   it 'responds to in_journey?' do
@@ -71,12 +73,16 @@ describe Oystercard do
     it 'deducts minimum fare from balance' do
       subject.top_up(subject.minimum_fare) #oystercard.top_up (by the minimum fare ) in order to make test pass
       subject.touch_in(station) #oystercard.touch_in(to station) to make test pass
-      expect { subject.touch_out}. to change{ subject.balance }.by(-(subject.minimum_fare)) #expect subject.touch_out to change the balance by (minus) the minimum fare
+      expect { subject.touch_out(station)}. to change{ subject.balance }.by(-(subject.minimum_fare)) #expect subject.touch_out to change the balance by (minus) the minimum fare
     end
 
-    it 'forgets the station on touch_out' do
-      subject.touch_out
-      expect(subject.touch_out).to be_empty
+    # it 'forgets the station on touch_out' do
+    #   subject.touch_out(station)
+    #   expect(subject.touch_out(station)).not_to be_empty
+    # end
+    it 'remembers the station' do
+      subject.touch_out(station) # oystercard.touch_out(to station)
+      expect(subject.exit_station).to eq station  # expect subject.exit_station to equal station
     end
   end
 
@@ -91,4 +97,19 @@ describe Oystercard do
       expect(subject.start_station).to be_empty # expect subject to not be in journey
     end
   end
+  describe '#history_of_journeys' do
+    it "returns an empty list of journeys by default" do
+      p subject.history_of_journeys
+      expect(subject.history_of_journeys).to be_empty
+    end
+  
+    it "returns an array with list of journey" do
+      subject.top_up(10)
+      subject.touch_in(start_station)
+      subject.touch_out(exit_station)
+      expect(subject.history_of_journeys.is_a?(Array)).to be_truthy
+    end
+  end
 end
+
+

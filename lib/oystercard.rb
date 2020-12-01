@@ -1,7 +1,7 @@
 require_relative 'station'
 
 class Oystercard # class (Object)
-  attr_accessor :balance, :capacity, :minimum_fare, :start_station  # when we need to change variables attr accessor allows us both read and write instance variables without using def name @name end (reader) and def name=(str) @name = str end (writer)
+  attr_accessor :balance, :capacity, :minimum_fare, :start_station, :exit_station, :num_of_journeys # when we need to change variables attr accessor allows us both read and write instance variables without using def name @name end (reader) and def name=(str) @name = str end (writer)
 
 
   DEFAULT_CAPACITY = 90 # constant is like a variable except its value is supposed to remain constant for the duration of the program (allows it to be changed for different users i.e different capacity/different prices etc)
@@ -13,6 +13,9 @@ class Oystercard # class (Object)
     @in_use = false # sets the starting status of in_use as false as it hasnt been used yet
     @minimum_fare = MINIMUM_FARE  #sets the minimum_fare to the value of the MINIMUM_FARE constant
     @start_station = ""
+    @exit_station = ""
+    @journeys = {}
+    @num_of_journeys = 0
   end
 
   def top_up(money) #method (property of owner)
@@ -26,14 +29,20 @@ class Oystercard # class (Object)
  
    def touch_in(station) #method with the argument of station 
     fail "Not enough funds" if @balance < 1 # fail if balance is below one (as it is lower than minimum fair)
-    # @in_use = true
     @start_station = station #start station is equal to the station we touch_in at 
+
   end
 
-  def touch_out #method of touch_out
+  def touch_out(station) #method of touch_out
     deduct(@minimum_fare) #deducts the minimum fare from the balance when touch_out is called
-    # @in_use = false
-    @start_station = ""
+    @exit_station = station
+    @num_of_journeys +=1
+
+    
+  end
+  def history_of_journeys
+    journey = @journeys[@num_of_journeys] = [@start_station]
+    journey = @journeys[@num_of_journeys].push(@exit_station)
   end
 
   def in_journey? #method of in_journey
