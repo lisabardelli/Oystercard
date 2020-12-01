@@ -35,8 +35,14 @@ describe Oystercard do
   describe "#touch_in" do
     it { is_expected.to respond_to(:touch_in) }
 
-    it 'should change journey_status to true' do
+    it 'should change journey_status to true if minimum amount is met' do
+      subject.top_up(10)
       expect {subject.touch_in}.to change {subject.journey_status}.to(true)
+    end
+
+    it 'should not allow touch_in if balance is under minimum amount' do
+    subject.top_up(0.5)
+    expect { subject.touch_in }.to raise_error "balance under £#{Oystercard::MINIMUM_AMOUNT}"
     end
   end
 
@@ -44,6 +50,7 @@ describe Oystercard do
     it { is_expected.to respond_to(:in_journey?) }
 
     it 'returns the journey status' do
+    subject.top_up(10)
     subject.touch_in
     expect(subject.in_journey?).to eq true
     end
@@ -53,6 +60,7 @@ describe Oystercard do
     it { is_expected.to respond_to(:touch_out) }
 
     it 'should change journey_status to false' do
+    subject.top_up(10)
     subject.touch_in
     expect {subject.touch_out}.to change {subject.journey_status}.to(false)
     end
