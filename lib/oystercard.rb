@@ -1,7 +1,7 @@
 require_relative 'station'
 
 class Oystercard # class (Object)
-  attr_accessor :balance, :capacity, :in_use, :minimum_fare, :start_station  # when we need to change variables attr accessor allows us both read and write instance variables without using def name @name end (reader) and def name=(str) @name = str end (writer)
+  attr_accessor :balance, :capacity, :minimum_fare, :start_station  # when we need to change variables attr accessor allows us both read and write instance variables without using def name @name end (reader) and def name=(str) @name = str end (writer)
 
 
   DEFAULT_CAPACITY = 90 # constant is like a variable except its value is supposed to remain constant for the duration of the program (allows it to be changed for different users i.e different capacity/different prices etc)
@@ -11,7 +11,8 @@ class Oystercard # class (Object)
     @balance = 0 # sets starting balance to 0 
     @capacity = DEFAULT_CAPACITY #sets capacity to the value of the DEFAULT_CAPACITY constant
     @in_use = false # sets the starting status of in_use as false as it hasnt been used yet
-    @minimum_fare = MINIMUM_FARE #sets the minimum_fare to the value of the MINIMUM_FARE constant
+    @minimum_fare = MINIMUM_FARE  #sets the minimum_fare to the value of the MINIMUM_FARE constant
+    @start_station = ""
   end
 
   def top_up(money) #method (property of owner)
@@ -25,17 +26,18 @@ class Oystercard # class (Object)
  
    def touch_in(station) #method with the argument of station 
     fail "Not enough funds" if @balance < 1 # fail if balance is below one (as it is lower than minimum fair)
-    @in_use = true # sets in_use to be true
+    # @in_use = true
     @start_station = station #start station is equal to the station we touch_in at 
   end
 
   def touch_out #method of touch_out
     deduct(@minimum_fare) #deducts the minimum fare from the balance when touch_out is called
-    @in_use = false # once touched out the status of in_use turns to false
+    # @in_use = false
+    @start_station = ""
   end
 
   def in_journey? #method of in_journey
-    @in_use == true # if in_use is equal to true then oystercard is in journey
+    @start_station# if in_use is equal to true then oystercard is in journey
   end
 
   def station #method of station
@@ -47,4 +49,7 @@ class Oystercard # class (Object)
     @balance -= money # same as balance = balance - money (therefore deducting it)
   end
 
+  def empty? 
+    true
+  end
 end

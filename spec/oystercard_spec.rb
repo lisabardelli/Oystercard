@@ -3,7 +3,7 @@ require 'station'
 
 describe Oystercard do
   let(:oystercard) { described_class.new }
-  let(:station) { Station.new }
+  let(:station) { double :station }
 
   it 'responds to balance' do
     expect(subject).to respond_to(:balance) #expects oystercard to respond to balance
@@ -41,11 +41,11 @@ describe Oystercard do
   end
 
   describe '#touch_in' do
-    it "changes @in_use from false to true" do
-      subject.top_up(subject.minimum_fare) # ystercard.top_up (by the minimum fare ) in order to make test passo
-      subject.touch_in(station) # oystercard.touch_in(to station)
-      expect(subject.in_use).to eq true # expect oystercard to be in use
-    end
+    # it "changes @in_use from false to true" do
+    #   subject.top_up(subject.minimum_fare) # ystercard.top_up (by the minimum fare ) in order to make test passo
+    #   subject.touch_in(station) # oystercard.touch_in(to station)
+    #   expect(subject.in_use).to eq true # expect oystercard to be in use
+    # end
 
     it 'touch in fails when balance < 1' do
       expect { subject.touch_in(station) }.to raise_error "Not enough funds" # expect subject.touch_in to fail due to there being not enough funds
@@ -56,20 +56,27 @@ describe Oystercard do
       subject.touch_in(station) # oystercard.touch_in(to station)
       expect(subject.start_station).to eq station  # expect subject.start_station to equal station
     end
+
+
   end
 
   describe '#touch_out' do
-    it ' changes @in_use from true to false' do
-        subject.top_up(subject.minimum_fare) #oystercard.top_up (by the minimum fare ) in order to make test pass
-        subject.touch_in(station) #oystercard.touch_in(to station) to make test pass
-        subject.touch_out #oystercard.touch_out of station to make test pass
-      expect(subject.in_use).to eq false # expect oystercard to not be in use
-    end
+    # it ' changes @in_use from true to false' do
+    #     subject.top_up(subject.minimum_fare) #oystercard.top_up (by the minimum fare ) in order to make test pass
+    #     subject.touch_in(station) #oystercard.touch_in(to station) to make test pass
+    #     subject.touch_out #oystercard.touch_out of station to make test pass
+    #   expect(subject.in_use).to eq false # expect oystercard to not be in use
+    # end
 
     it 'deducts minimum fare from balance' do
       subject.top_up(subject.minimum_fare) #oystercard.top_up (by the minimum fare ) in order to make test pass
       subject.touch_in(station) #oystercard.touch_in(to station) to make test pass
       expect { subject.touch_out}. to change{ subject.balance }.by(-(subject.minimum_fare)) #expect subject.touch_out to change the balance by (minus) the minimum fare
+    end
+
+    it 'forgets the station on touch_out' do
+      subject.touch_out
+      expect(subject.touch_out).to be_empty
     end
   end
 
@@ -81,7 +88,7 @@ describe Oystercard do
     end
 
     it 'returns false if card not in use' do
-      expect(subject).not_to be_in_journey # expect subject to not be in journey
+      expect(subject.start_station).to be_empty # expect subject to not be in journey
     end
   end
 end
