@@ -3,10 +3,12 @@ class Oystercard
   MINIMUM_AMOUNT = 1
   attr_reader :balance
   attr_reader :entry_station
+  attr_reader :history
 
   def initialize
     @balance = 0
     @entry_station = nil
+    @history = {}
   end
 
   def top_up(amount)
@@ -17,6 +19,7 @@ class Oystercard
 
   def touch_in(entry_station)
     fail "balance under £#{MINIMUM_AMOUNT}" if @balance < MINIMUM_AMOUNT
+
     @entry_station = entry_station
   end
 
@@ -24,8 +27,12 @@ class Oystercard
     @entry_station != nil
   end
 
-  def touch_out
+  def touch_out(exit_station)
     deduct(MINIMUM_AMOUNT)
+
+    @history[:in] = @entry_station
+    @history[:out] = exit_station
+
     @entry_station = nil
   end
 
