@@ -1,4 +1,5 @@
 require 'journey'
+require 'oystercard'
 
 describe Journey do
   let(:oystercard) { Oystercard.new }
@@ -45,5 +46,29 @@ describe Journey do
       subject.touch_in(entry_station, oystercard)
       expect { subject.touch_out(exit_station, oystercard) }.to change { oystercard.balance }.by(-1)
     end
+  end
+  describe '#fare' do
+    it { is_expected.to respond_to(:fare).with(1).argument }
+
+    it 'returns the minimum fare' do
+      oystercard.top_up(10)
+      subject.touch_in(entry_station, oystercard)
+      subject.touch_out(exit_station, oystercard)
+      expect(subject.fare(oystercard)).to eq Oystercard::MINIMUM_FARE
+    end
+
+    it 'returns the penalty fare if no touch in' do
+      oystercard.top_up(10)
+      subject.touch_out(exit_station, oystercard)
+      expect(subject.fare(oystercard)).to eq Oystercard::PENALTY_FARE
+    end
+
+    it 'returns the penalty fare if no touch in' do
+      oystercard.top_up(10)
+      subject.touch_in(entry_station, oystercard)
+      subject.touch_out(nil, oystercard)
+      expect(subject.fare(oystercard)).to eq Oystercard::PENALTY_FARE
+    end
+
   end
 end

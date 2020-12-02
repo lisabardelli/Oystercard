@@ -1,17 +1,19 @@
 require_relative './oystercard'
 
 class Journey
-    
+
   attr_reader :history, :balance
 
   def initialize
     @entry_station = nil
     @journey = {}
+    @travel_status = false
   end
 
   def touch_in(entry_station, oystercard)
     raise "balance under £#{Oystercard::MINIMUM_AMOUNT}" if oystercard.balance < (Oystercard::MINIMUM_AMOUNT)
 
+    @travel_status = true
     @entry_station = entry_station
   end
 
@@ -23,20 +25,18 @@ class Journey
     oystercard.deduct(Oystercard::MINIMUM_AMOUNT)
 
     @exit_station = exit_station
-
     make_journey(oystercard)
   end
 
   def make_journey(oystercard)
+    @travel_status = false
     update_recent_journey
-
     add_journey_to_history(oystercard)
-
-    reset_stations
   end
 
   def add_journey_to_history(oystercard)
     oystercard.history.append(@journey)
+    reset_stations
   end
 
   def update_recent_journey
@@ -47,5 +47,9 @@ class Journey
   def reset_stations
     @entry_station = nil
     @exit_station = nil
+  end
+
+  def fare(oystercard)
+    @journey[:in] != nil && @journey[:out] != nil ? Oystercard::MINIMUM_FARE : Oystercard::PENALTY_FARE
   end
 end

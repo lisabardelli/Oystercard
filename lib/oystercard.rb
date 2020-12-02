@@ -2,6 +2,8 @@ require_relative './journey.rb'
 class Oystercard
   MAXIMUM_LIMIT = 90
   MINIMUM_AMOUNT = 1
+  MINIMUM_FARE = 1
+  PENALTY_FARE = 6
   attr_reader :balance, :entry_station, :exit_station, :history, :journey
 
   def initialize
