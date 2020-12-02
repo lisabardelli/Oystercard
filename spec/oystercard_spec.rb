@@ -4,112 +4,103 @@ require 'station'
 describe Oystercard do
   let(:oystercard) { described_class.new }
   let(:station) { double :station }
-  let(:start_station) {double :start_station}
-  let(:exit_station) {double :exit_station}
+  let(:start_station) { double :start_station }
+  let(:exit_station) { double :exit_station }
 
   it 'responds to balance' do
-    expect(subject).to respond_to(:balance) #expects oystercard to respond to balance
+    expect(subject).to respond_to(:balance)
   end
 
   it 'initializes with a balance of zero' do
-    expect(subject.balance).to eq 0 #expect oystercard balance to equal zero
+    expect(subject.balance).to eq 0
   end
 
   it 'responds to top_up' do
-    expect(subject).to respond_to(:top_up).with(1).argument #expect oystercard to respond to top up(with 1 argument)
+    expect(subject).to respond_to(:top_up).with(1).argument
   end
 
   it 'oystercard responds to touch_in' do
-    expect(subject).to respond_to(:touch_in).with(1).argument #expect oystercard to respond to touch in (with 1 argument)
+    expect(subject).to respond_to(:touch_in).with(1).argument
   end
 
   it 'responds to touch_out' do
-    expect(subject).to respond_to(:touch_out).with(1).argument  # expect oystercard to respond to touch out 
+    expect(subject).to respond_to(:touch_out).with(1).argument
   end
 
-  it 'responds to in_journey?' do
-    expect(subject).to respond_to(:in_journey?) # expect oystercard to respond to in journey? 
+  it 'responds to close_journey' do
+    expect(subject).to respond_to(:close_journey).with(1).argument
   end
+  
 
   describe '#top_up' do
     it 'will top up the balance' do
-      expect { subject.top_up(1) }.to change { subject.balance }.by 1 #expect oystercard.top up to change the balance by 1
+      expect { subject.top_up(1) }.to change { subject.balance }.by 1
     end
 
     it 'raises error if user tries to topup past max capacity' do
-      subject.capacity.times { subject.top_up(1) } # oystercard.capacity 
-      expect { subject.top_up(1) }.to raise_error "Cap  of #{subject.capacity} reached"
+      expect { subject.top_up(Oystercard::DEFAULT_CAPACITY + 1) }.to raise_error(RuntimeError, "Cap  of #{Oystercard::DEFAULT_CAPACITY} reached")
     end
   end
 
   describe '#touch_in' do
-    # it "changes @in_use from false to true" do
-    #   subject.top_up(subject.minimum_fare) # ystercard.top_up (by the minimum fare ) in order to make test passo
-    #   subject.touch_in(station) # oystercard.touch_in(to station)
-    #   expect(subject.in_use).to eq true # expect oystercard to be in use
-    # end
+    it 'changes @in_use from false to true' do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      subject.touch_in(station)
+      expect(subject.is_travelling).to eq true
+    end
 
     it 'touch in fails when balance < 1' do
-      expect { subject.touch_in(station) }.to raise_error "Not enough funds" # expect subject.touch_in to fail due to there being not enough funds
+      expect { subject.touch_in(station) }.to raise_error(RuntimeError,'Not enough funds')
     end
 
     it 'remembers the station' do
-      subject.top_up(subject.minimum_fare) # subject.top_up (by minimum fare) in order to make test work
-      subject.touch_in(station) # oystercard.touch_in(to station)
-      expect(subject.start_station).to eq station  # expect subject.start_station to equal station
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      expect(subject.touch_in(station)).to eq station
     end
-
-
   end
 
   describe '#touch_out' do
-    # it ' changes @in_use from true to false' do
-    #     subject.top_up(subject.minimum_fare) #oystercard.top_up (by the minimum fare ) in order to make test pass
-    #     subject.touch_in(station) #oystercard.touch_in(to station) to make test pass
-    #     subject.touch_out #oystercard.touch_out of station to make test pass
-    #   expect(subject.in_use).to eq false # expect oystercard to not be in use
-    # end
+    it ' changes @is_travelling from true to false' do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      subject.touch_in(station)
+      subject.touch_out(station)
+      expect(subject.is_travelling).to eq false
+    end
 
     it 'deducts minimum fare from balance' do
-      subject.top_up(subject.minimum_fare) #oystercard.top_up (by the minimum fare ) in order to make test pass
-      subject.touch_in(station) #oystercard.touch_in(to station) to make test pass
-      expect { subject.touch_out(station)}. to change{ subject.balance }.by(-(subject.minimum_fare)) #expect subject.touch_out to change the balance by (minus) the minimum fare
+      subject.top_up(20)
+      subject.touch_in(station)
+      expect{subject.touch_out(station)}.to change{subject.balance }.from(20).to(subject.balance - Oystercard::MINIMUM_FARE)
     end
 
-    # it 'forgets the station on touch_out' do
-    #   subject.touch_out(station)
-    #   expect(subject.touch_out(station)).not_to be_empty
-    # end
-    it 'remembers the station' do
-      subject.touch_out(station) # oystercard.touch_out(to station)
-      expect(subject.exit_station).to eq station  # expect subject.exit_station to equal station
+    it 'raises an error if is_travelling is false' do
+      subject.top_up(10)
+      expect{ subject.touch_out(station) }.to raise_error(RuntimeError, "The Oystercard has not touched in")
     end
   end
 
-  describe '#in_journey?' do
+  describe '#is_travelling?' do
     it 'return true if card is in use' do
-      subject.top_up(subject.minimum_fare) #oystercard.top_up (by the minimum fare ) in order to make test pass
-      subject.touch_in(station)  #oystercard.touch_in(to station) to make test pass
-      expect(subject).to be_in_journey # expect oystercard(owner) to be in journey after you've touched in
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      subject.touch_in(station)
+      expect(subject.is_travelling).to be true
     end
 
-    it 'returns false if card not in use' do
-      expect(subject.start_station).to be_empty # expect subject to not be in journey
+    it 'returns false if card not is_travelling' do
+      expect(subject.is_travelling).to be false
     end
   end
-  describe '#history_of_journeys' do
-    it "returns an empty list of journeys by default" do
-      p subject.history_of_journeys
-      expect(subject.history_of_journeys).to be_empty
+  describe '#close_journey' do
+    it 'returns a list of journeys with nil value' do
+      expected = { 'start' => nil, 'end' => nil }
+      expect(subject.close_journey(station)).to eq expected
     end
-  
-    it "returns an array with list of journey" do
+
+    it 'returns an hash with list of journey' do
       subject.top_up(10)
       subject.touch_in(start_station)
       subject.touch_out(exit_station)
-      expect(subject.history_of_journeys.is_a?(Array)).to be_truthy
+      expect(subject.close_journey(station).is_a?(Hash)).to be_truthy
     end
   end
 end
-
-
