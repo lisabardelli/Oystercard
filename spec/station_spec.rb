@@ -1,7 +1,7 @@
 require 'station'
 
 describe Station do
-  let(:station){ Station.new("Farringdon") }
+  let(:station) { Station.new('Farringdon') }
 
   it 'expects station to be an instance of the station class' do
     expect(station).to be_an_instance_of(Station)
@@ -16,8 +16,7 @@ describe Station do
   end
 
   it 'returns the zone 3 if the station is Streatham' do
-    station_one = Station.new("Streatham")
+    station_one = Station.new('Streatham')
     expect(station_one.return_zone).to eq 3
   end
-
 end

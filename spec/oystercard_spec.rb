@@ -26,7 +26,6 @@ describe Oystercard do
     end
   end
 
-
   describe '#history' do
     it { is_expected.to respond_to(:history) }
 

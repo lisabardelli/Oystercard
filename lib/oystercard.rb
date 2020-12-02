@@ -1,4 +1,4 @@
-require_relative './journey.rb'
+require_relative './journey'
 class Oystercard
   MAXIMUM_LIMIT = 90
   MINIMUM_AMOUNT = 1

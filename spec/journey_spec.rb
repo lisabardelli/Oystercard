@@ -69,6 +69,5 @@ describe Journey do
       subject.touch_out(nil, oystercard)
       expect(subject.fare(oystercard)).to eq Oystercard::PENALTY_FARE
     end
-
   end
 end

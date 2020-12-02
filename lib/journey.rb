@@ -1,7 +1,6 @@
 require_relative './oystercard'
 
 class Journey
-
   attr_reader :history, :balance
 
   def initialize
@@ -49,7 +48,7 @@ class Journey
     @exit_station = nil
   end
 
-  def fare(oystercard)
-    @journey[:in] != nil && @journey[:out] != nil ? Oystercard::MINIMUM_FARE : Oystercard::PENALTY_FARE
+  def fare(_oystercard)
+    !@journey[:in].nil? && !@journey[:out].nil? ? Oystercard::MINIMUM_FARE : Oystercard::PENALTY_FARE
   end
 end
