@@ -89,9 +89,22 @@ let(:exit_station){ double :station }
 
     it 'displays history of journeys' do
       subject.top_up(10)
+      2.times {
+        subject.touch_in(entry_station)
+        subject.touch_out(exit_station)
+      }
+      expect(subject.history).to eq( [{:in => entry_station, :out => exit_station}, {:in => entry_station, :out => exit_station} ] )
+    end
+  end
+
+  describe '#journey' do
+    it { is_expected.to respond_to(:journey) }
+
+    it 'holds the current journey in hash' do
+      subject.top_up(10)
       subject.touch_in(entry_station)
       subject.touch_out(exit_station)
-      expect(subject.history).to include( :in => entry_station, :out => exit_station )
+      expect(subject.journey).to include( :in => entry_station, :out => exit_station )
     end
   end
 end
