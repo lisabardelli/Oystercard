@@ -1,5 +1,4 @@
 RSpec.describe Oystercard::Card do
-  # let(:oystercard) {Oystercard.new}
   let(:entry_station) { double :entry_station }
   let(:exit_station) { double :exit_station }
   describe '#top_up' do
@@ -14,13 +13,6 @@ RSpec.describe Oystercard::Card do
   end
 
   describe '#touch_in' do
-    # it "touch in to start a journey" do
-    #   subject.top_up(10)
-    #   #expect(subject).not_to be_in_journey
-    #   subject.touch_in(entry_station)
-    #   #expect(subject).to be_in_journey
-    # end
-
     it 'raises error when insufficient funds' do
       expect { subject.touch_in(entry_station) }.to raise_error 'Insufficient funds'
     end
@@ -40,23 +32,9 @@ RSpec.describe Oystercard::Card do
   end
 
   describe '#touch_out' do
-    # it "touch out to end journey" do
-    #   subject.top_up(10)
-    #   subject.touch_in(entry_station)
-    #   subject.touch_out
-    #   expect(subject).not_to be_in_journey
-    # end
-
     it 'reduces the balance by minimum fare' do
       expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-Oystercard::Card::MIN_FARE)
     end
-
-    # it "returns nil for entry station" do
-    #   subject.top_up(10)
-    #   subject.touch_in(entry_station)
-    #   subject.touch_out(exit_station)
-    #   expect(subject.entry_station).to eq(nil)
-    # end
   end
   describe '#store_journey' do
     it 'returns an hash with nil values ' do
